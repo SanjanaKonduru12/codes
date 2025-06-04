@@ -1,1 +1,57 @@
-# codes
+import tkinter as tk
+from datetime import datetime
+import time
+import threading
+class ClockStopwatchApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Clock and Stopwatch")
+        # Clock Label
+        self.clock_label = tk.Label(root, text="", font=('Helvetica', 30), fg='blue')
+        self.clock_label.pack(pady=10)
+        # Stopwatch Label
+        self.stopwatch_label = tk.Label(root, text="00:00:00", font=('Helvetica', 40), fg='green')
+        self.stopwatch_label.pack(pady=10)
+        # Buttons
+        self.start_btn = tk.Button(root, text="Start", command=self.start, width=10)
+        self.start_btn.pack(side='left', padx=20, pady=20)
+        self.stop_btn = tk.Button(root, text="Stop", command=self.stop, width=10)
+        self.stop_btn.pack(side='left', padx=20, pady=20)
+        self.reset_btn = tk.Button(root, text="Reset", command=self.reset, width=10)
+        self.reset_btn.pack(side='left', padx=20, pady=20)
+        self.running = False
+        self.start_time = None
+        self.elapsed_time = 0
+        self.update_clock()
+    def update_clock(self):
+        now = datetime.now().strftime("%H:%M:%S")
+        self.clock_label.config(text=now)
+        self.root.after(1000, self.update_clock)
+
+    def update_stopwatch(self):
+        if self.running:
+            elapsed = time.time() - self.start_time + self.elapsed_time
+            mins, secs = divmod(int(elapsed), 60)
+            hours, mins = divmod(mins, 60)
+            self.stopwatch_label.config(text=f"{hours:02}:{mins:02}:{secs:02}")
+            self.root.after(500, self.update_stopwatch)
+
+    def start(self):
+        if not self.running:
+            self.start_time = time.time()
+            self.running = True
+            self.update_stopwatch()
+
+    def stop(self):
+        if self.running:
+            self.elapsed_time += time.time() - self.start_time
+            self.running = False
+
+    def reset(self):
+        self.running = False
+        self.elapsed_time = 0
+        self.stopwatch_label.config(text="00:00:00")
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ClockStopwatchApp(root)
+    root.mainloop()
